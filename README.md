@@ -1,1 +1,0 @@
-# shizukujp&kiyoharujp
