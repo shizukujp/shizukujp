@@ -1,0 +1,148 @@
+使用 git mv 修改文件名
+git mv 是 Git 提供的一个命令，用于重命名文件和目录，同时保持版本控制的一致性。使用这个命令，Git 可以正确地记录文件名的更改，并且自动将重命名操作加入到暂存区（staging area）。
+
+基本语法
+bash
+コードをコピーする
+git mv <旧文件路径> <新文件路径>
+示例
+假设你想将项目中的 oldfile.txt 重命名为 newfile.txt，可以使用以下命令：
+
+bash
+コードをコピーする
+git mv oldfile.txt newfile.txt
+这样做将会：
+
+将 oldfile.txt 重命名为 newfile.txt。
+自动将该更改加入到 Git 的暂存区。
+你可以通过以下命令提交更改：
+
+bash
+コードをコピーする
+git commit -m "Renamed oldfile.txt to newfile.txt"
+使用 Bash 命令 mv 修改文件名
+如果你只想在文件系统中重命名文件，并手动管理暂存和提交，你可以使用标准的 Bash 命令 mv。
+
+基本语法
+bash
+コードをコピーする
+mv <旧文件路径> <新文件路径>
+<旧文件路径>：要重命名的文件的当前路径。
+<新文件路径>：文件的新路径或名称。
+示例
+bash
+コードをコピーする
+mv oldfile.txt newfile.txt
+
+
+
+
+一些常见的示例
+1. 重命名多个文件
+使用 Bash 的 mv 命令结合 for 循环，可以重命名多个文件。例如，将所有 .txt 文件重命名为 .md 文件：
+
+bash
+コードをコピーする
+for file in *.txt; do
+  mv "$file" "${file%.txt}.md"
+done
+
+# 更新 Git
+git add .
+git commit -m "Renamed all .txt files to .md"
+2. 在不同目录中移动文件
+可以使用 git mv 将文件从一个目录移动到另一个目录，并重命名文件：
+
+bash
+コードをコピーする
+git mv path/to/oldfile.txt path/to/newdirectory/newfile.txt
+git commit -m "Moved and renamed oldfile.txt to newdirectory/newfile.txt"
+
+
+
+
+
+如果你有一系列文件，比如 HelloWorld0.txt, HelloWorld1.txt, ..., HelloWorld10.txt，并希望将这些文件的前缀改为 NewWorld，扩展名从 .txt 改为 .md，可以使用一个简单的 Bash 脚本来实现这一批量重命名的操作。
+
+使用 for 循环和 mv 命令
+下面是一个使用 for 循环和 mv 命令的脚本示例：
+
+bash
+コードをコピーする
+# 遍历从 0 到 10 的数列
+for i in {0..10}; do
+  # 构造旧文件名和新文件名
+  old_filename="HelloWorld${i}.txt"
+  new_filename="NewWorld${i}.md"
+
+  # 检查旧文件是否存在
+  if [ -e "$old_filename" ]; then
+    # 执行重命名
+    mv "$old_filename" "$new_filename"
+    echo "Renamed $old_filename to $new_filename"
+  else
+    echo "File $old_filename does not exist."
+  fi
+done
+详细步骤解析
+for i in {0..10}：这是一个 Bash 循环，i 从 0 递增到 10。对于每个 i，都会执行一次循环体中的代码。
+
+old_filename="HelloWorld${i}.txt"：定义旧文件名，${i} 会被替换为当前循环中的数字。生成的旧文件名为 HelloWorld0.txt, HelloWorld1.txt, ..., HelloWorld10.txt。
+
+new_filename="NewWorld${i}.md"：定义新文件名，${i} 同样被替换为当前的数字。生成的新文件名为 NewWorld0.md, NewWorld1.md, ..., NewWorld10.md。
+
+if [ -e "$old_filename" ]; then：检查旧文件是否存在，-e 用于判断文件是否存在。
+
+mv "$old_filename" "$new_filename"：使用 mv 命令将旧文件重命名为新文件。
+
+echo "Renamed $old_filename to $new_filename"：输出重命名操作的信息。
+
+else echo "File $old_filename does not exist."：如果文件不存在，输出相应的信息。
+
+done：结束循环。
+
+运行脚本
+将上述脚本保存为一个文件，例如 rename_files.sh，然后在 Git Bash 或其他 Bash 环境中执行：
+
+bash
+コードをコピーする
+bash rename_files.sh
+处理文件不存在的情况
+如果目录中没有完整的 HelloWorld0.txt 到 HelloWorld10.txt 文件，那么脚本会输出文件不存在的提示：
+
+css
+コードをコピーする
+Renamed HelloWorld0.txt to NewWorld0.md
+Renamed HelloWorld1.txt to NewWorld1.md
+File HelloWorld2.txt does not exist.
+Renamed HelloWorld3.txt to NewWorld3.md
+...
+这样可以确保脚本在缺失文件时不会报错。
+
+扩展：处理更复杂的文件名
+如果文件名结构更复杂，比如中间有其他字符，可以使用 sed、awk 或 rename 命令。
+
+使用 rename 命令
+如果你在系统上安装了 rename 命令，可以用它批量重命名文件：
+
+bash
+コードをコピーする
+rename 's/^HelloWorld/NewWorld/' *.txt
+这条命令使用正则表达式，将所有 .txt 文件中以 HelloWorld 开头的部分替换为 NewWorld。
+
+使用 sed 结合 find
+如果需要更灵活的文件查找和重命名方案，可以结合 find 和 sed：
+
+bash
+コードをコピーする
+find . -type f -name "HelloWorld*.txt" | while read file; do
+  new_file=$(echo "$file" | sed 's/HelloWorld/NewWorld/' | sed 's/\.txt$/.md/')
+  mv "$file" "$new_file"
+done
+find . -type f -name "HelloWorld*.txt"：查找当前目录及其子目录下所有匹配 HelloWorld*.txt 的文件。
+
+sed 's/HelloWorld/NewWorld/'：使用 sed 命令替换文件名前缀。
+
+sed 's/\.txt$/.md/'：将文件扩展名从 .txt 改为 .md。
+
+mv "$file" "$new_file"：将原文件名重命名为新文件名。
