@@ -1,6 +1,7 @@
 # text
 testhw.txt
 mydirectory/
+TestBGM.zip
 
 # ignore all .log file
 *.log
